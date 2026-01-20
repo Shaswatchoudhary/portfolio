@@ -92,6 +92,16 @@ const handleSubmit = (e) => {
   let form = document.getElementById("contact-form");
   let formData = new FormData(form);
 
+  // Validation
+  const name = formData.get("name");
+  const email = formData.get("email");
+  const message = formData.get("Message");
+
+  if (!name || !email || !message) {
+    alert("Please fill in all required fields (Name, Email, Message).");
+    return;
+  }
+
   const simulateSuccess = () => {
     form.reset();
     document.querySelector(".form-submit-wrapper").classList.add("visible");
