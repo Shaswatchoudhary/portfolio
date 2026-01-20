@@ -1,4 +1,4 @@
-const images = document.querySelector("#proyects .cards");
+const images = document.querySelector("#projects .cards");
 let currentCard = 3;
 let cardWidth;
 let mobileDif = 0;
@@ -15,7 +15,7 @@ var observer = new IntersectionObserver(onIntersection, {
   rootMargin: "-150px",
 });
 
-const sections = ["me", "about", "skills", "proyects", "contact"];
+const sections = ["me", "about", "skills", "projects", "contact"];
 
 function onIntersection(entries, opts) {
   entries.forEach((entry) => {
@@ -28,8 +28,7 @@ function onIntersection(entries, opts) {
 
         document
           .querySelectorAll(
-            `${nextSectionId ? `#${nextSectionId} img[data-src], ` : ""}#${
-              entry.target.id
+            `${nextSectionId ? `#${nextSectionId} img[data-src], ` : ""}#${entry.target.id
             } img[data-src]`
           )
           .forEach((element) => {
@@ -41,7 +40,7 @@ function onIntersection(entries, opts) {
         let tilt = document.createElement("script");
         tilt.src = "tilt.min.js";
         document.head.appendChild(tilt);
-      } else if (entry.target.id === "proyects") {
+      } else if (entry.target.id === "projects") {
         let sEvents = document.createElement("script");
         sEvents.src = "swiped-events.min.js";
         document.head.appendChild(sEvents);
@@ -49,13 +48,11 @@ function onIntersection(entries, opts) {
         if (!entry.isIntersecting || window.innerWidth > 1000) return;
         setTimeout(() => {
           images.style.transitionDuration = "0.5s";
-          images.style.transform = `translate(-${
-            currentCard * cardWidth - mobileDif + 100
-          }px)`;
-          setTimeout(() => {
-            images.style.transform = `translate(-${
-              currentCard * cardWidth - mobileDif
+          images.style.transform = `translate(-${currentCard * cardWidth - mobileDif + 100
             }px)`;
+          setTimeout(() => {
+            images.style.transform = `translate(-${currentCard * cardWidth - mobileDif
+              }px)`;
             setTimeout(() => {
               images.style.transitionDuration = "0s";
             }, 500);
@@ -94,25 +91,36 @@ const handleSubmit = (e) => {
   e.preventDefault();
   let form = document.getElementById("contact-form");
   let formData = new FormData(form);
+
+  const simulateSuccess = () => {
+    form.reset();
+    document.querySelector(".form-submit-wrapper").classList.add("visible");
+    setTimeout(() => {
+      document.querySelector(".form-submit-wrapper").classList.remove("visible");
+      document.querySelector(".form-submit-wrapper").classList.add("leave");
+      setTimeout(() => {
+        document.querySelector(".form-submit-wrapper").classList.remove("leave");
+      }, 800);
+    }, 3000);
+  };
+
+  // Check if running on localhost
+  if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+    // Simulate network delay
+    setTimeout(() => {
+      simulateSuccess();
+      alert("Message sent! (Localhost simulation - Deploy to Netlify for real emails)");
+    }, 1000);
+    return;
+  }
+
   fetch("/", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams(formData).toString(),
   })
     .then(() => {
-      form.reset();
-      document.querySelector(".form-submit-wrapper").classList.add("visible");
-      setTimeout(() => {
-        document
-          .querySelector(".form-submit-wrapper")
-          .classList.remove("visible");
-        document.querySelector(".form-submit-wrapper").classList.add("leave");
-        setTimeout(() => {
-          document
-            .querySelector(".form-submit-wrapper")
-            .classList.remove("leave");
-        }, 800);
-      }, 3000);
+      simulateSuccess();
     })
     .catch((error) => alert(error));
 };
@@ -141,9 +149,8 @@ window.addEventListener("resize", (e) => {
     cardWidth = 460;
   }
 
-  images.style.transform = `translate(-${
-    currentCard * cardWidth - mobileDif
-  }px)`;
+  images.style.transform = `translate(-${currentCard * cardWidth - mobileDif
+    }px)`;
 });
 
 const firstCardClone = images.children[0].cloneNode(true);
@@ -151,7 +158,7 @@ const lastCardClone =
   images.children[images.children.length - 1].cloneNode(true);
 
 const originals = [];
-document.querySelectorAll("#proyects .card").forEach((el) => {
+document.querySelectorAll("#projects .card").forEach((el) => {
   const cl = el.cloneNode(true);
   cl.classList.remove("visible");
   originals.push(cl);
@@ -174,15 +181,14 @@ images.addEventListener("swiped", (e) => {
 });
 
 images.addEventListener("mousedown", (e) => {
-  e.path.forEach((element) => {
-    if (element.classList && element.classList.contains("card")) {
-      const children = Array.prototype.slice.call(images.children);
-      const index = children.indexOf(element);
-      const dif = index - currentCard;
-      if (dif > 0) handleCardClickPos(dif);
-      else if (dif < 0) handleCardClickNeg(-dif);
-    }
-  });
+  const element = e.target.closest(".card");
+  if (element && images.contains(element)) {
+    const children = Array.prototype.slice.call(images.children);
+    const index = children.indexOf(element);
+    const dif = index - currentCard;
+    if (dif > 0) handleCardClickPos(dif);
+    else if (dif < 0) handleCardClickNeg(-dif);
+  }
 });
 
 let currentOriginalPos = 1;
@@ -190,9 +196,8 @@ const handleCardClickPos = (dif) => {
   images.style.setProperty("pointer-events", "none");
   currentCard += dif;
   images.style.transitionDuration = "0.5s";
-  images.style.transform = `translate(-${
-    currentCard * cardWidth - mobileDif
-  }px)`;
+  images.style.transform = `translate(-${currentCard * cardWidth - mobileDif
+    }px)`;
   for (var i = 0; i < dif; i++) {
     const clone = originals[currentOriginalPos].cloneNode(true);
     const clE = images.appendChild(clone);
@@ -215,9 +220,8 @@ const handleCardClickPos = (dif) => {
       images.children[0].remove();
     }
     images.style.transitionDuration = "0s";
-    images.style.transform = `translate(-${
-      currentCard * cardWidth - mobileDif
-    }px)`;
+    images.style.transform = `translate(-${currentCard * cardWidth - mobileDif
+      }px)`;
   }, 500);
   currentOriginalNeg -= dif;
   if (currentOriginalNeg <= 0) {
@@ -394,7 +398,7 @@ const setupAvatar = () => {
       .addEventListener("mouseleave", () => {
         noiseStep = 0.0005;
       });
-  } catch {}
+  } catch { }
 };
 
 const avatar = document.getElementById("avatar");
@@ -444,10 +448,10 @@ if ("serviceWorker" in navigator) {
     navigator.serviceWorker
       .register("worker.js")
       .then(
-        function (registration) {},
-        function (err) {}
+        function (registration) { },
+        function (err) { }
       )
-      .catch(function (err) {});
+      .catch(function (err) { });
   });
 }
 
